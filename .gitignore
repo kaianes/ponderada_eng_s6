@@ -1,0 +1,29 @@
+# Ignorar ambiente virtual (venv)
+venv/
+.env
+
+# Ignorar credenciais do Firebase
+firebase_credentials.json
+
+# Ignorar arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+
+# Ignorar cache do Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignorar logs e arquivos temporários
+*.log
+*.sqlite3
+*.db
+*.pid
+
+# Ignorar arquivos de dependências
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Ignorar configurações do VS Code
+.vscode/

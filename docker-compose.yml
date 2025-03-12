@@ -1,0 +1,56 @@
+
+services:
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    restart: always
+    ports:
+      - "9090:9090"  # Porta web do Prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - app-network
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+  rappitors_api:
+    build:
+      context: ./src/rappitors_api
+    image: rappitors_api
+    container_name: rappitors_api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./src/config:/app/config
+    environment:
+      - FIREBASE_CREDENTIALS=/app/config/alocacao-entregadores-firebase-credenciais.json
+      - VIRTUAL_HOST=api.local  
+      - VIRTUAL_PORT=8000      
+
+    networks:
+      - app-network
+
+  monitor-service:
+    build:
+      context: ./src/system_performance/monitor-service
+    image: monitor-service
+    container_name: monitor-service
+    depends_on:
+      - rappitors_api
+    networks:
+      - app-network
+    ports:
+      - "8089:8089"  # UI do Locust
+      - "9646:9646"  # Métricas do Prometheus
+    environment:
+      - FIREBASE_CREDENTIALS=/app/config/alocacao-entregadores-firebase-credenciais.json
+    volumes:
+      - ./src/config:/app/config
+    command: >
+      locust -f /app/locustfile.py --host http://rappitors_api:5000
+
+volumes:
+  grafana-storage:
+
+networks:
+  app-network:
+    driver: bridge
